@@ -511,7 +511,7 @@
   // CONFIGURAÇÃO — altere aqui para novas ações
   // =============================================
   const CONFIG = {
-    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwSzOs2z_Cau-521Mij6cl6as8GeAS-3HLv9dYtG5gGOP8j2dvrUujhC3Y5l3rdOgAm/exec",
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwSzOs2z_Cau-52lMij6cl6as8GeAS-3HLv9dYtG5gGOP8j2dvrUujhC3Y5l3rdOgAm/exec",
     ACAO: "AÇÃO PIX"
   };
   // =============================================
@@ -672,7 +672,7 @@
         const msg = result.field === 'whatsapp'
           ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
           : result.field === 'pix'
-          ? '⚠️ Esta chave PIX já foi utilizada nesta ação!'
+          ? '⚠️ Chave PIX já registrada nesta ação!'
           : '⚠️ Esses dados já foram enviados anteriormente!';
         document.getElementById('alertErrorMsg').textContent = msg;
         document.getElementById('alertError').classList.add('show');
