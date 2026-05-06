@@ -655,8 +655,9 @@
     btn.disabled = true;
 
     try {
-      const response = await fetch(CONFIG.SCRIPT_URL, {
+      await fetch(CONFIG.SCRIPT_URL, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           whatsapp: whatsapp.replace(/\D/g, ''),
@@ -668,29 +669,9 @@
         })
       });
 
-      const result = await response.json();
-
-      if (result.status === 'duplicate') {
-        const msg = result.field === 'whatsapp'
-          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
-          : result.field === 'pix'
-          ? '⚠️ Esta chave PIX já foi utilizada nesta ação!'
-          : '⚠️ Esses dados já foram enviados anteriormente!';
-
-        document.getElementById('alertErrorMsg').textContent = msg;
-        document.getElementById('alertError').classList.add('show');
-        btn.classList.remove('loading');
-        btn.disabled = false;
-        return;
-      }
-
-      if (result.status === 'success') {
-        submitted = true;
-        document.getElementById('formCard').style.display = 'none';
-        document.getElementById('successScreen').classList.add('show');
-      } else {
-        throw new Error('Erro desconhecido');
-      }
+      submitted = true;
+      document.getElementById('formCard').style.display = 'none';
+      document.getElementById('successScreen').classList.add('show');
 
     } catch (e) {
       document.getElementById('alertErrorMsg').textContent = 'Erro ao enviar. Tente novamente em instantes.';
