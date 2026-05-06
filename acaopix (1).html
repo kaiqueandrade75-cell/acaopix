@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AÇÃO PIX | Helder da Bet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00FF6A;
+    --green-dark: #00C44F;
+    --black: #0a0a0a;
+    --dark: #111111;
+    --card: #181818;
+    --border: #222;
+    --white: #ffffff;
+    --gray: #aaaaaa;
+    --error: #ff4444;
+    --success: #00FF6A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 60% 20%, rgba(0,255,106,0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(0,255,106,0.04) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 30px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .logo-ring {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--green);
+    padding: 3px;
+    margin: 0 auto 16px;
+    box-shadow: 0 0 30px rgba(0,255,106,0.3);
+  }
+
+  .logo-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--card);
+  }
+
+  .logo-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--green-dark), #005c25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--black);
+  }
+
+  .header-tag {
+    display: inline-block;
+    background: var(--green);
+    color: var(--black);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    line-height: 1;
+    letter-spacing: 2px;
+    color: var(--white);
+  }
+
+  .header h1 span {
+    color: var(--green);
+  }
+
+  .header p {
+    font-size: 13px;
+    color: var(--gray);
+    margin-top: 8px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    gap: 8px;
+    margin: 24px 0;
+    animation: fadeUp 0.6s 0.15s ease both;
+  }
+
+  .step {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .step-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .step-text {
+    font-size: 10px;
+    color: var(--gray);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  /* Card */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    animation: fadeUp 0.6s 0.25s ease both;
+  }
+
+  .card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    color: var(--white);
+  }
+
+  .card-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 24px;
+  }
+
+  /* Form */
+  .field {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+  }
+
+  input, select {
+    width: 100%;
+    background: #0f0f0f;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+
+  input::placeholder {
+    color: #444;
+    font-weight: 400;
+  }
+
+  input:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,255,106,0.1);
+  }
+
+  input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(255,68,68,0.1);
+  }
+
+  input.success-field {
+    border-color: var(--green);
+  }
+
+  .field-error {
+    font-size: 11px;
+    color: var(--error);
+    margin-top: 6px;
+    font-weight: 600;
+    display: none;
+  }
+
+  .field-error.show { display: block; }
+
+  /* PIX type selector */
+  .pix-types {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .pix-type-btn {
+    flex: 1;
+    background: #0f0f0f;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 4px;
+    color: var(--gray);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  .pix-type-btn.active {
+    background: rgba(0,255,106,0.1);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  /* Alert box */
+  .alert {
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: none;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.4;
+  }
+
+  .alert.show { display: flex; }
+
+  .alert-error {
+    background: rgba(255,68,68,0.1);
+    border: 1px solid rgba(255,68,68,0.3);
+    color: #ff7777;
+  }
+
+  .alert-success {
+    background: rgba(0,255,106,0.1);
+    border: 1px solid rgba(0,255,106,0.3);
+    color: var(--green);
+  }
+
+  .alert-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* Button */
+  .btn {
+    width: 100%;
+    background: var(--green);
+    color: var(--black);
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--green-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,255,106,0.3);
+  }
+
+  .btn:active:not(:disabled) { transform: translateY(0); }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .btn-loading {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn.loading .btn-text { display: none; }
+  .btn.loading .btn-loading { display: flex; }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: var(--black);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 32px;
+    animation: fadeUp 0.6s 0.35s ease both;
+  }
+
+  .footer p {
+    font-size: 11px;
+    color: #444;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+
+  .footer .brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    color: var(--green);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* Success screen */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .success-screen.show { display: block; }
+
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(0,255,106,0.1);
+    border: 2px solid var(--green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 24px;
+    box-shadow: 0 0 40px rgba(0,255,106,0.2);
+  }
+
+  .success-screen h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--green);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .success-screen p {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-ring">
+      <div class="logo-placeholder">HB</div>
+    </div>
+    <div class="header-tag">Helder da Bet</div>
+    <h1>AÇÃO <span>PIX</span></h1>
+    <p>Preencha seus dados para receber</p>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">✅</div>
+      <div class="step-text">Concluiu as etapas</div>
+    </div>
+    <div class="step">
+      <div class="step-icon">📝</div>
+      <div class="step-text">Preencha o formulário</div>
+    </div>
+    <div class="step">
+      <div class="step-icon">💸</div>
+      <div class="step-text">Receba no PIX</div>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="card" id="formCard">
+    <div class="card-title">SEUS DADOS</div>
+    <div class="card-sub">Preencha corretamente para receber seu PIX</div>
+
+    <!-- Alert -->
+    <div class="alert alert-error" id="alertError">
+      <span class="alert-icon">⚠️</span>
+      <span id="alertErrorMsg"></span>
+    </div>
+
+    <!-- WhatsApp -->
+    <div class="field">
+      <label>WhatsApp</label>
+      <input type="tel" id="whatsapp" placeholder="(11) 99999-9999" maxlength="15" inputmode="numeric">
+      <div class="field-error" id="whatsappError"></div>
+    </div>
+
+    <!-- Nome -->
+    <div class="field">
+      <label>Nome Completo</label>
+      <input type="text" id="nome" placeholder="Seu nome completo">
+      <div class="field-error" id="nomeError"></div>
+    </div>
+
+    <!-- PIX -->
+    <div class="field">
+      <label>Chave PIX</label>
+      <div class="pix-types">
+        <button class="pix-type-btn active" onclick="setPixType('cpf')">CPF</button>
+        <button class="pix-type-btn" onclick="setPixType('telefone')">Telefone</button>
+        <button class="pix-type-btn" onclick="setPixType('email')">E-mail</button>
+      </div>
+      <input type="text" id="pix" placeholder="Digite seu CPF">
+      <div class="field-error" id="pixError"></div>
+    </div>
+
+    <button class="btn" id="submitBtn" onclick="handleSubmit()">
+      <span class="btn-text">QUERO RECEBER MEU PIX 💸</span>
+      <span class="btn-loading"><span class="spinner"></span> ENVIANDO...</span>
+    </button>
+  </div>
+
+  <!-- Success Screen -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <h2>DADOS ENVIADOS!</h2>
+    <p>Seus dados foram recebidos com sucesso.<br>Em breve você receberá seu PIX! 🤑</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>+18 | JOGUE COM RESPONSABILIDADE</p>
+    <div class="brand">@HELDERDABET</div>
+  </div>
+
+</div>
+
+<script>
+  // =============================================
+  // CONFIGURAÇÃO — altere aqui para novas ações
+  // =============================================
+  const CONFIG = {
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwSzOs2z_Cau-52lMij6cl6as8GeAS-8HLv9dYtG5gGOP8j2dvrUujhC3Y5l3rdOgAm",
+    ACAO: "AÇÃO PIX"
+  };
+  // =============================================
+
+  // Pegar analista da URL (?analista=kaique)
+  const params = new URLSearchParams(window.location.search);
+  const analista = (params.get('analista') || 'kaique').toLowerCase();
+
+  // Tipo de PIX selecionado
+  let pixType = 'cpf';
+
+  function setPixType(type) {
+    pixType = type;
+    document.querySelectorAll('.pix-type-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const pixInput = document.getElementById('pix');
+    pixInput.value = '';
+    clearError('pix');
+
+    if (type === 'cpf') {
+      pixInput.placeholder = 'Digite seu CPF';
+      pixInput.inputMode = 'numeric';
+      pixInput.maxLength = 14;
+    } else if (type === 'telefone') {
+      pixInput.placeholder = '(11) 99999-9999';
+      pixInput.inputMode = 'numeric';
+      pixInput.maxLength = 15;
+    } else {
+      pixInput.placeholder = 'seu@email.com';
+      pixInput.inputMode = 'email';
+      pixInput.maxLength = 100;
+    }
+  }
+
+  // Máscaras
+  document.getElementById('whatsapp').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+    else if (v.length > 0) v = `(${v}`;
+    this.value = v;
+  });
+
+  document.getElementById('pix').addEventListener('input', function() {
+    if (pixType === 'cpf') {
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 9) v = `${v.slice(0,3)}.${v.slice(3,6)}.${v.slice(6,9)}-${v.slice(9)}`;
+      else if (v.length > 6) v = `${v.slice(0,3)}.${v.slice(3,6)}.${v.slice(6)}`;
+      else if (v.length > 3) v = `${v.slice(0,3)}.${v.slice(3)}`;
+      this.value = v;
+    } else if (pixType === 'telefone') {
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0, 11);
+      if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+      else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+      else if (v.length > 0) v = `(${v}`;
+      this.value = v;
+    }
+  });
+
+  // Validações
+  function clearError(field) {
+    document.getElementById(field).classList.remove('error');
+    document.getElementById(field + 'Error').classList.remove('show');
+  }
+
+  function showError(field, msg) {
+    document.getElementById(field).classList.add('error');
+    const el = document.getElementById(field + 'Error');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function validateWhatsapp(v) {
+    const digits = v.replace(/\D/g, '');
+    if (digits.length < 10) return 'WhatsApp inválido — mínimo 10 dígitos';
+    return null;
+  }
+
+  function validateNome(v) {
+    if (v.trim().length < 3) return 'Digite seu nome completo';
+    if (/^\d+$/.test(v.trim())) return 'Nome não pode conter apenas números';
+    if (v.trim().split(' ').length < 2) return 'Digite nome e sobrenome';
+    return null;
+  }
+
+  function validatePix(v) {
+    if (!v.trim()) return 'Chave PIX obrigatória';
+    if (pixType === 'cpf') {
+      const digits = v.replace(/\D/g, '');
+      if (digits.length !== 11) return 'CPF inválido — deve ter 11 dígitos';
+      if (/^(\d)\1+$/.test(digits)) return 'CPF inválido';
+      return null;
+    }
+    if (pixType === 'telefone') {
+      const digits = v.replace(/\D/g, '');
+      if (digits.length < 10 || digits.length > 11) return 'Telefone PIX inválido';
+      return null;
+    }
+    if (pixType === 'email') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return 'E-mail inválido';
+      return null;
+    }
+    return null;
+  }
+
+  // Anti-spam: bloquear envio múltiplo
+  let submitted = false;
+
+  async function handleSubmit() {
+    if (submitted) return;
+
+    const whatsapp = document.getElementById('whatsapp').value;
+    const nome = document.getElementById('nome').value;
+    const pix = document.getElementById('pix').value;
+
+    // Limpar erros
+    ['whatsapp', 'nome', 'pix'].forEach(clearError);
+    document.getElementById('alertError').classList.remove('show');
+
+    // Validar
+    let hasError = false;
+
+    const wErr = validateWhatsapp(whatsapp);
+    if (wErr) { showError('whatsapp', wErr); hasError = true; }
+
+    const nErr = validateNome(nome);
+    if (nErr) { showError('nome', nErr); hasError = true; }
+
+    const pErr = validatePix(pix);
+    if (pErr) { showError('pix', pErr); hasError = true; }
+
+    if (hasError) return;
+
+    // Loading
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const response = await fetch(CONFIG.SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          whatsapp: whatsapp.replace(/\D/g, ''),
+          nome: nome.trim(),
+          pix: pix.trim(),
+          pixType,
+          analista,
+          acao: CONFIG.ACAO
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'duplicate') {
+        const msg = result.field === 'whatsapp'
+          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
+          : result.field === 'pix'
+          ? '⚠️ Esta chave PIX já foi utilizada nesta ação!'
+          : '⚠️ Esses dados já foram enviados anteriormente!';
+
+        document.getElementById('alertErrorMsg').textContent = msg;
+        document.getElementById('alertError').classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        return;
+      }
+
+      if (result.status === 'success') {
+        submitted = true;
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('successScreen').classList.add('show');
+      } else {
+        throw new Error('Erro desconhecido');
+      }
+
+    } catch (e) {
+      document.getElementById('alertErrorMsg').textContent = 'Erro ao enviar. Tente novamente em instantes.';
+      document.getElementById('alertError').classList.add('show');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+</script>
+
+</body>
+</html>
