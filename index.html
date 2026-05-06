@@ -655,43 +655,39 @@
     btn.disabled = true;
 
     try {
-      const payload = JSON.stringify({
+      const params = new URLSearchParams({
+        action: 'submit',
         whatsapp: whatsapp.replace(/\D/g, ''),
         nome: nome.trim(),
         pix: pix.trim(),
-        pixType,
-        analista,
-        acao: CONFIG.ACAO
+        analista: analista
       });
 
-      // Usar jsonp via form submit para contornar CORS
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = CONFIG.SCRIPT_URL;
-      form.target = 'hidden_iframe';
-      form.style.display = 'none';
+      const url = CONFIG.SCRIPT_URL + '?' + params.toString();
 
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'payload';
-      input.value = payload;
-      form.appendChild(input);
+      const response = await fetch(url, { method: 'GET' });
+      const result = await response.json();
 
-      const iframe = document.createElement('iframe');
-      iframe.name = 'hidden_iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-      document.body.appendChild(form);
+      if (result.status === 'duplicate') {
+        const msg = result.field === 'whatsapp'
+          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
+          : result.field === 'pix'
+          ? '⚠️ Esta chave PIX já foi utilizada nesta ação!'
+          : '⚠️ Esses dados já foram enviados anteriormente!';
+        document.getElementById('alertErrorMsg').textContent = msg;
+        document.getElementById('alertError').classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        return;
+      }
 
-      form.submit();
-
-      setTimeout(() => {
+      if (result.status === 'success') {
         submitted = true;
         document.getElementById('formCard').style.display = 'none';
         document.getElementById('successScreen').classList.add('show');
-        document.body.removeChild(form);
-        document.body.removeChild(iframe);
-      }, 2000);
+      } else {
+        throw new Error(result.message || 'Erro desconhecido');
+      }
 
     } catch (e) {
       document.getElementById('alertErrorMsg').textContent = 'Erro ao enviar. Tente novamente em instantes.';
