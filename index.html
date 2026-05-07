@@ -508,23 +508,25 @@
 
 <script>
   // =============================================
-  // CONFIGURAÇÃO
+  // CONFIGURAÇÃO — altere aqui para novas ações
   // =============================================
   const CONFIG = {
     SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwSzOs2z_Cau-52lMij6cl6as8GeAS-3HLv9dYtG5gGOP8j2dvrUujhC3Y5l3rdOgAm/exec",
     ACAO: "AÇÃO PIX"
   };
+  // =============================================
 
+  // Pegar analista da URL (?analista=kaique)
   const params = new URLSearchParams(window.location.search);
   const analista = (params.get('analista') || 'kaique').toLowerCase();
 
+  // Tipo de PIX selecionado
   let pixType = 'cpf';
-  let submitted = false;
 
   function setPixType(type) {
     pixType = type;
     document.querySelectorAll('.pix-type-btn').forEach(b => b.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    event.target.classList.add('active');
 
     const pixInput = document.getElementById('pix');
     pixInput.value = '';
@@ -545,7 +547,7 @@
     }
   }
 
-  // Máscaras (mantidas do original)
+  // Máscaras
   document.getElementById('whatsapp').addEventListener('input', function() {
     let v = this.value.replace(/\D/g, '');
     if (v.length > 11) v = v.slice(0, 11);
@@ -573,6 +575,7 @@
     }
   });
 
+  // Validações
   function clearError(field) {
     document.getElementById(field).classList.remove('error');
     document.getElementById(field + 'Error').classList.remove('show');
@@ -585,14 +588,15 @@
     el.classList.add('show');
   }
 
-  // Validações simplificadas (mantendo lógica original)
   function validateWhatsapp(v) {
     const digits = v.replace(/\D/g, '');
-    return digits.length < 10 ? 'WhatsApp inválido — mínimo 10 dígitos' : null;
+    if (digits.length < 10) return 'WhatsApp inválido — mínimo 10 dígitos';
+    return null;
   }
 
   function validateNome(v) {
     if (v.trim().length < 3) return 'Digite seu nome completo';
+    if (/^\d+$/.test(v.trim())) return 'Nome não pode conter apenas números';
     if (v.trim().split(' ').length < 2) return 'Digite nome e sobrenome';
     return null;
   }
@@ -602,10 +606,23 @@
     if (pixType === 'cpf') {
       const digits = v.replace(/\D/g, '');
       if (digits.length !== 11) return 'CPF inválido — deve ter 11 dígitos';
+      if (/^(\d)\1+$/.test(digits)) return 'CPF inválido';
+      return null;
+    }
+    if (pixType === 'telefone') {
+      const digits = v.replace(/\D/g, '');
+      if (digits.length < 10 || digits.length > 11) return 'Telefone PIX inválido';
+      return null;
+    }
+    if (pixType === 'email') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return 'E-mail inválido';
       return null;
     }
     return null;
   }
+
+  // Anti-spam: bloquear envio múltiplo
+  let submitted = false;
 
   async function handleSubmit() {
     if (submitted) return;
@@ -618,8 +635,9 @@
     ['whatsapp', 'nome', 'pix'].forEach(clearError);
     document.getElementById('alertError').classList.remove('show');
 
-    // Validação
+    // Validar
     let hasError = false;
+
     const wErr = validateWhatsapp(whatsapp);
     if (wErr) { showError('whatsapp', wErr); hasError = true; }
 
@@ -641,39 +659,51 @@
         whatsapp: whatsapp.replace(/\D/g, ''),
         nome: nome.trim(),
         pix: pix.trim(),
-        pixType: pixType,
         analista: analista
       };
 
       const response = await fetch(CONFIG.SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        redirect: 'follow'
       });
 
       const text = await response.text();
       console.log('Resposta raw:', text);
 
-      const result = JSON.parse(text);
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch(parseErr) {
+        throw new Error('Resposta inválida do servidor: ' + text.substring(0, 100));
+      }
+
+      if (result.status === 'duplicate') {
+        const msg = result.field === 'whatsapp'
+          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
+          : result.field === 'pix'
+          ? '⚠️ Chave PIX já registrada nesta ação!'
+          : '⚠️ Esses dados já foram enviados anteriormente!';
+        document.getElementById('alertErrorMsg').textContent = msg;
+        document.getElementById('alertError').classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        return;
+      }
 
       if (result.status === 'success') {
         submitted = true;
         document.getElementById('formCard').style.display = 'none';
         document.getElementById('successScreen').classList.add('show');
-      } else if (result.status === 'duplicate') {
-        const msg = result.field === 'whatsapp' 
-          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!' 
-          : '⚠️ Esta chave PIX já foi registrada!';
-        document.getElementById('alertErrorMsg').textContent = msg;
-        document.getElementById('alertError').classList.add('show');
       } else {
         throw new Error(result.message || 'Erro desconhecido');
       }
+
     } catch (e) {
-      console.error(e);
-      document.getElementById('alertErrorMsg').textContent = 'Erro de conexão. Tente novamente.';
+      console.error('Erro no envio:', e.message);
+      document.getElementById('alertErrorMsg').textContent = 'Erro ao enviar: ' + e.message;
       document.getElementById('alertError').classList.add('show');
-    } finally {
       btn.classList.remove('loading');
       btn.disabled = false;
     }
