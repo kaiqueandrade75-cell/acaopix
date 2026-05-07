@@ -120,16 +120,17 @@
 
     const input = document.getElementById('pix');
     input.value = '';
-    if (type === 'cpf') input.placeholder = 'Digite seu CPF';
+    if (type === 'cpf') input.placeholder = 'Digite seu CPF (apenas números)';
     else if (type === 'telefone') input.placeholder = '(11) 99999-9999';
     else input.placeholder = 'seu@email.com';
   }
 
-  // Máscaras simples
+  // Máscara WhatsApp
   document.getElementById('whatsapp').addEventListener('input', function() {
     let v = this.value.replace(/\D/g, '').substring(0,11);
     if (v.length > 6) this.value = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
     else if (v.length > 2) this.value = `(${v.slice(0,2)}) ${v.slice(2)}`;
+    else this.value = v;
   });
 
   function clearErrors() {
@@ -137,9 +138,8 @@
     document.getElementById('alertError').classList.remove('show');
   }
 
-  function showError(field, message) {
-    document.getElementById(field).classList.add('error');
-    document.getElementById('alertErrorMsg').textContent = message;
+  function showError(message) {
+    document.getElementById('alertErrorMsg').innerHTML = '⚠️ ' + message;
     document.getElementById('alertError').classList.add('show');
   }
 
@@ -152,11 +152,12 @@
 
     clearErrors();
 
-    if (whatsapp.replace(/\D/g,'').length < 10) return showError('whatsapp', 'WhatsApp inválido');
-    if (nome.length < 5) return showError('nome', 'Digite seu nome completo');
-    if (!pix) return showError('pix', 'Chave PIX obrigatória');
+    if (whatsapp.replace(/\D/g,'').length < 10) return showError('WhatsApp inválido');
+    if (nome.length < 5) return showError('Digite seu nome completo');
+    if (!pix) return showError('Informe sua chave PIX');
 
     const btn = document.getElementById('submitBtn');
+    const originalText = btn.textContent;
     btn.textContent = "ENVIANDO...";
     btn.disabled = true;
 
@@ -165,14 +166,19 @@
         whatsapp: whatsapp.replace(/\D/g, ''),
         nome: nome,
         pix: pix,
-        analista: analista
+        analista: analista,
+        pixType: pixType
       };
 
       const response = await fetch(CONFIG.SCRIPT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'text/plain;charset=utf-8'   // ← Solução principal para CORS
+        },
         body: JSON.stringify(payload)
       });
+
+      if (!response.ok) throw new Error('Erro no servidor');
 
       const result = await response.json();
 
@@ -181,15 +187,15 @@
         document.getElementById('formCard').style.display = 'none';
         document.getElementById('successScreen').classList.add('show');
       } else if (result.status === 'duplicate') {
-        showError('whatsapp', result.field === 'whatsapp' ? 'WhatsApp já cadastrado!' : 'PIX já cadastrado!');
+        showError(result.field === 'whatsapp' ? 'Este WhatsApp já foi cadastrado!' : 'Esta chave PIX já foi cadastrada!');
       } else {
-        showError('whatsapp', result.message || 'Erro ao salvar dados');
+        showError(result.message || 'Erro ao salvar dados');
       }
     } catch (err) {
-      console.error(err);
-      showError('whatsapp', 'Erro de conexão. Tente novamente.');
+      console.error('Erro completo:', err);
+      showError('Erro de conexão. Tente novamente em alguns segundos.');
     } finally {
-      btn.textContent = "QUERO RECEBER MEU PIX 💸";
+      btn.textContent = originalText;
       btn.disabled = false;
     }
   }
