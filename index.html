@@ -511,7 +511,7 @@
   // CONFIGURAÇÃO — altere aqui para novas ações
   // =============================================
   const CONFIG = {
-    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwSzOs2z_Cau-52lMij6cl6as8GeAS-3HLv9dYtG5gGOP8j2dvrUujhC3Y5l3rdOgAm/exec",
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwvDNxlArSRRUOnwhU7Uk9Z5z2ekzxcuXpL9YFoPIu_n4ndznk3eYbSMM-h6Er8k8uQ/exec",
     ACAO: "AÇÃO PIX"
   };
   // =============================================
@@ -625,77 +625,86 @@
   let submitted = false;
 
   async function handleSubmit() {
-    if (submitted) return;
 
-    const whatsapp = document.getElementById('whatsapp').value;
-    const nome = document.getElementById('nome').value;
-    const pix = document.getElementById('pix').value;
+    console.log('Resposta RAW:', text);
 
-    // Limpar erros
-    ['whatsapp', 'nome', 'pix'].forEach(clearError);
-    document.getElementById('alertError').classList.remove('show');
-
-    // Validar
-    let hasError = false;
-
-    const wErr = validateWhatsapp(whatsapp);
-    if (wErr) { showError('whatsapp', wErr); hasError = true; }
-
-    const nErr = validateNome(nome);
-    if (nErr) { showError('nome', nErr); hasError = true; }
-
-    const pErr = validatePix(pix);
-    if (pErr) { showError('pix', pErr); hasError = true; }
-
-    if (hasError) return;
-
-    // Loading
-    const btn = document.getElementById('submitBtn');
-    btn.classList.add('loading');
-    btn.disabled = true;
+    let result;
 
     try {
-      const params = new URLSearchParams({
-        action: 'submit',
-        whatsapp: whatsapp.replace(/\D/g, ''),
-        nome: nome.trim(),
-        pix: pix.trim(),
-        analista: analista
-      });
 
-      const url = CONFIG.SCRIPT_URL + '?' + params.toString();
+      result = JSON.parse(text);
 
-      const response = await fetch(url, { method: 'GET' });
-      const result = await response.json();
+    } catch (parseErr) {
 
-      if (result.status === 'duplicate') {
-        const msg = result.field === 'whatsapp'
-          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
+      throw new Error(
+        'Resposta inválida do servidor: ' +
+        text.substring(0, 150)
+      );
+
+    }
+
+    console.log('JSON convertido:', result);
+
+    // DUPLICIDADE
+    if (result.status === 'duplicate') {
+
+      const msg =
+        result.field === 'whatsapp'
+          ? '⚠️ Este WhatsApp já foi cadastrado!'
           : result.field === 'pix'
-          ? '⚠️ Chave PIX já registrada nesta ação!'
-          : '⚠️ Esses dados já foram enviados anteriormente!';
-        document.getElementById('alertErrorMsg').textContent = msg;
-        document.getElementById('alertError').classList.add('show');
-        btn.classList.remove('loading');
-        btn.disabled = false;
-        return;
-      }
+          ? '⚠️ Esta chave PIX já foi utilizada!'
+          : '⚠️ Dados duplicados detectados!';
 
-      if (result.status === 'success') {
-        submitted = true;
-        document.getElementById('formCard').style.display = 'none';
-        document.getElementById('successScreen').classList.add('show');
-      } else {
-        throw new Error(result.message || 'Erro desconhecido');
-      }
+      document.getElementById('alertErrorMsg').textContent = msg;
 
-    } catch (e) {
-      document.getElementById('alertErrorMsg').textContent = 'Erro ao enviar. Tente novamente em instantes.';
-      document.getElementById('alertError').classList.add('show');
+      document
+        .getElementById('alertError')
+        .classList.add('show');
+
       btn.classList.remove('loading');
       btn.disabled = false;
+
+      return;
+
     }
+
+    // SUCESSO
+    if (result.status === 'success') {
+
+      submitted = true;
+
+      document.getElementById('formCard').style.display = 'none';
+
+      document
+        .getElementById('successScreen')
+        .classList.add('show');
+
+      return;
+
+    }
+
+    // ERRO RETORNADO PELO BACKEND
+    throw new Error(
+      result.message || 'Erro desconhecido'
+    );
+
+  } catch (e) {
+
+    console.error('ERRO COMPLETO:', e);
+
+    document.getElementById('alertErrorMsg').textContent =
+      'Erro ao enviar. Tente novamente.';
+
+    document
+      .getElementById('alertError')
+      .classList.add('show');
+
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
   }
+
+}
 </script>
 
 </body>
