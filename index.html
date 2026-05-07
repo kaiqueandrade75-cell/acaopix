@@ -477,9 +477,9 @@
     <div class="field">
       <label>Chave PIX</label>
       <div class="pix-types">
-        <button class="pix-type-btn active" onclick="setPixType('cpf')">CPF</button>
-        <button class="pix-type-btn" onclick="setPixType('telefone')">Telefone</button>
-        <button class="pix-type-btn" onclick="setPixType('email')">E-mail</button>
+        <button type="button" class="pix-type-btn active" onclick="setPixType(event, 'cpf')">CPF</button>
+        <button type="button" class="pix-type-btn" onclick="setPixType(event, 'telefone')">Telefone</button>
+        <button type="button" class="pix-type-btn" onclick="setPixType(event, 'email')">E-mail</button>
       </div>
       <input type="text" id="pix" placeholder="Digite seu CPF">
       <div class="field-error" id="pixError"></div>
@@ -571,7 +571,7 @@ fetch('https://api.ipify.org?format=json')
   // =============================================
   let pixType = 'cpf';
 
-  function setPixType(type) {
+  function setPixType(event, type) {
 
     pixType = type;
 
@@ -579,7 +579,7 @@ fetch('https://api.ipify.org?format=json')
       .querySelectorAll('.pix-type-btn')
       .forEach(b => b.classList.remove('active'));
 
-    event.target.classList.add('active');
+    event.currentTarget.classList.add('active');
 
     const pixInput =
       document.getElementById('pix');
@@ -858,7 +858,7 @@ fetch('https://api.ipify.org?format=json')
           analista,
 
         visitorId:
-          visitorId
+          visitorId,
 
         ip: window.userIP || '',
 
