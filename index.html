@@ -509,11 +509,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
 
   <script>
-fetch('https://api.ipify.org?format=json')
+    window.userIP = '';
+    
+    fetch('https://api.ipify.org?format=json')
   .then(r => r.json())
   .then(data => {
     window.userIP = data.ip;
     console.log('IP:', window.userIP);
+  })
+      .catch(() => {
+            console.log('IP não carregado');
+
   });
 </script>
   
@@ -572,6 +578,7 @@ fetch('https://api.ipify.org?format=json')
   let pixType = 'cpf';
 
   function setPixType(event, type) {
+    event.preventDefault();
 
     pixType = type;
 
