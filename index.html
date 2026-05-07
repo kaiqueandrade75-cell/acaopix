@@ -477,15 +477,15 @@
     <div class="field">
       <label>Chave PIX</label>
       <div class="pix-types">
-        <button type="button" class="pix-type-btn active" onclick="setPixType(event, 'cpf')">CPF</button>
-        <button type="button" class="pix-type-btn" onclick="setPixType(event, 'telefone')">Telefone</button>
-        <button type="button" class="pix-type-btn" onclick="setPixType(event, 'email')">E-mail</button>
+        <button type="button" class="pix-type-btn active" onclick="setPixType(this, 'cpf')">CPF</button>
+        <button type="button" class="pix-type-btn" onclick="setPixType(this, 'telefone')">Telefone</button>
+        <button type="button" class="pix-type-btn" onclick="setPixType(this, 'email')">E-mail</button>
       </div>
       <input type="text" id="pix" placeholder="Digite seu CPF">
       <div class="field-error" id="pixError"></div>
     </div>
 
-    <button class="btn" id="submitBtn" onclick="handleSubmit()">
+    <button type="button" class="btn" id="submitBtn" onclick="handleSubmit()">
       <span class="btn-text">QUERO RECEBER MEU PIX 💸</span>
       <span class="btn-loading"><span class="spinner"></span> ENVIANDO...</span>
     </button>
@@ -577,8 +577,7 @@
   // =============================================
   let pixType = 'cpf';
 
-  function setPixType(event, type) {
-    event.preventDefault();
+  function setPixType(button, type) {
 
     pixType = type;
 
@@ -586,7 +585,7 @@
       .querySelectorAll('.pix-type-btn')
       .forEach(b => b.classList.remove('active'));
 
-    event.currentTarget.classList.add('active');
+      button.classList.add('active');
 
     const pixInput =
       document.getElementById('pix');
