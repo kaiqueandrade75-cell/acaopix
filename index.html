@@ -621,155 +621,93 @@
     return null;
   }
 
-// Anti-spam: bloquear envio múltiplo
-let submitted = false;
+  // Anti-spam: bloquear envio múltiplo
+  let submitted = false;
 
-async function handleSubmit() {
+  async function handleSubmit() {
+    if (submitted) return;
 
-  if (submitted) return;
+    const whatsapp = document.getElementById('whatsapp').value;
+    const nome = document.getElementById('nome').value;
+    const pix = document.getElementById('pix').value;
 
-  const whatsapp = document.getElementById('whatsapp').value;
-  const nome = document.getElementById('nome').value;
-  const pix = document.getElementById('pix').value;
+    // Limpar erros
+    ['whatsapp', 'nome', 'pix'].forEach(clearError);
+    document.getElementById('alertError').classList.remove('show');
 
-  // Limpar erros
-  ['whatsapp', 'nome', 'pix'].forEach(clearError);
+    // Validar
+    let hasError = false;
 
-  document
-    .getElementById('alertError')
-    .classList.remove('show');
+    const wErr = validateWhatsapp(whatsapp);
+    if (wErr) { showError('whatsapp', wErr); hasError = true; }
 
-  // Validar
-  let hasError = false;
+    const nErr = validateNome(nome);
+    if (nErr) { showError('nome', nErr); hasError = true; }
 
-  const wErr = validateWhatsapp(whatsapp);
+    const pErr = validatePix(pix);
+    if (pErr) { showError('pix', pErr); hasError = true; }
 
-  if (wErr) {
-    showError('whatsapp', wErr);
-    hasError = true;
-  }
+    if (hasError) return;
 
-  const nErr = validateNome(nome);
-
-  if (nErr) {
-    showError('nome', nErr);
-    hasError = true;
-  }
-
-  const pErr = validatePix(pix);
-
-  if (pErr) {
-    showError('pix', pErr);
-    hasError = true;
-  }
-
-  if (hasError) return;
-
-  // Loading
-  const btn = document.getElementById('submitBtn');
-
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  try {
-
-    const payload = {
-      whatsapp: whatsapp.replace(/\D/g, ''),
-      nome: nome.trim(),
-      pix: pix.trim(),
-      analista: analista
-    };
-
-    const response = await fetch(CONFIG.SCRIPT_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
-      body: JSON.stringify(payload),
-      redirect: 'follow'
-    });
-
-    const text = await response.text();
-
-    console.log('Resposta RAW:', text);
-
-    let result;
+    // Loading
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
 
     try {
+      const payload = {
+        whatsapp: whatsapp.replace(/\D/g, ''),
+        nome: nome.trim(),
+        pix: pix.trim(),
+        analista: analista
+      };
 
-      result = JSON.parse(text);
+      const response = await fetch(CONFIG.SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload),
+        redirect: 'follow'
+      });
 
-    } catch (parseErr) {
+      const text = await response.text();
+      console.log('Resposta raw:', text);
 
-      throw new Error(
-        'Resposta inválida do servidor: ' +
-        text.substring(0, 150)
-      );
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch(parseErr) {
+        throw new Error('Resposta inválida do servidor: ' + text.substring(0, 100));
+      }
 
-    }
-
-    console.log('JSON convertido:', result);
-
-    // DUPLICIDADE
-    if (result.status === 'duplicate') {
-
-      const msg =
-        result.field === 'whatsapp'
-          ? '⚠️ Este WhatsApp já foi cadastrado!'
+      if (result.status === 'duplicate') {
+        const msg = result.field === 'whatsapp'
+          ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!'
           : result.field === 'pix'
-          ? '⚠️ Esta chave PIX já foi utilizada!'
-          : '⚠️ Dados duplicados detectados!';
+          ? '⚠️ Chave PIX já registrada nesta ação!'
+          : '⚠️ Esses dados já foram enviados anteriormente!';
+        document.getElementById('alertErrorMsg').textContent = msg;
+        document.getElementById('alertError').classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        return;
+      }
 
-      document.getElementById('alertErrorMsg').textContent = msg;
+      if (result.status === 'success') {
+        submitted = true;
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('successScreen').classList.add('show');
+      } else {
+        throw new Error(result.message || 'Erro desconhecido');
+      }
 
-      document
-        .getElementById('alertError')
-        .classList.add('show');
-
+    } catch (e) {
+      console.error('Erro no envio:', e.message);
+      document.getElementById('alertErrorMsg').textContent = 'Erro ao enviar: ' + e.message;
+      document.getElementById('alertError').classList.add('show');
       btn.classList.remove('loading');
       btn.disabled = false;
-
-      return;
-
     }
-
-    // SUCESSO
-    if (result.status === 'success') {
-
-      submitted = true;
-
-      document.getElementById('formCard').style.display = 'none';
-
-      document
-        .getElementById('successScreen')
-        .classList.add('show');
-
-      return;
-
-    }
-
-    // ERRO RETORNADO PELO BACKEND
-    throw new Error(
-      result.message || 'Erro desconhecido'
-    );
-
-  } catch (e) {
-
-    console.error('ERRO COMPLETO:', e);
-
-    document.getElementById('alertErrorMsg').textContent =
-      'Erro ao enviar. Tente novamente.';
-
-    document
-      .getElementById('alertError')
-      .classList.add('show');
-
-    btn.classList.remove('loading');
-    btn.disabled = false;
-
   }
-
-}
 </script>
 
 </body>
