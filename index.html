@@ -1,89 +1,311 @@
-async function handleSubmit() {
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AÇÃO PIX | Helder da Bet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00FF6A;
+    --green-dark: #00C44F;
+    --black: #0a0a0a;
+    --dark: #111111;
+    --card: #181818;
+    --border: #222;
+    --white: #ffffff;
+    --gray: #aaaaaa;
+    --error: #ff4444;
+    --success: #00FF6A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 60% 20%, rgba(0,255,106,0.07) 0%, transparent 50%),
+                radial-gradient(ellipse at 20% 80%, rgba(0,255,106,0.04) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 20px 60px; }
+  .header { text-align: center; padding: 40px 0 30px; animation: fadeDown 0.6s ease both; }
+  .logo-ring { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--green); padding: 3px; margin: 0 auto 16px; box-shadow: 0 0 30px rgba(0,255,106,0.3); }
+  .logo-placeholder { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, var(--green-dark), #005c25); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--black); }
+  .header-tag { display: inline-block; background: var(--green); color: var(--black); font-size: 10px; font-weight: 900; letter-spacing: 3px; padding: 4px 12px; border-radius: 2px; margin-bottom: 10px; text-transform: uppercase; }
+  .header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; letter-spacing: 2px; color: var(--white); }
+  .header h1 span { color: var(--green); }
+  .header p { font-size: 13px; color: var(--gray); margin-top: 8px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  .steps { display: flex; gap: 8px; margin: 24px 0; animation: fadeUp 0.6s 0.15s ease both; }
+  .step { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; text-align: center; }
+  .step-icon { font-size: 20px; margin-bottom: 4px; }
+  .step-text { font-size: 10px; color: var(--gray); font-weight: 600; line-height: 1.3; }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; animation: fadeUp 0.6s 0.25s ease both; }
+  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 4px; color: var(--white); }
+  .card-sub { font-size: 12px; color: var(--gray); margin-bottom: 24px; }
+
+  .field { margin-bottom: 16px; }
+  label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+  input { width: 100%; background: #0f0f0f; border: 1.5px solid var(--border); border-radius: 10px; padding: 14px 16px; color: var(--white); font-size: 14px; font-weight: 600; outline: none; transition: all 0.2s; }
+  input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(0,255,106,0.1); }
+  input.error { border-color: var(--error); box-shadow: 0 0 0 3px rgba(255,68,68,0.1); }
+
+  .field-error { font-size: 11px; color: var(--error); margin-top: 6px; font-weight: 600; display: none; }
+  .field-error.show { display: block; }
+
+  .pix-types { display: flex; gap: 8px; margin-bottom: 10px; }
+  .pix-type-btn { flex: 1; background: #0f0f0f; border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 4px; color: var(--gray); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .pix-type-btn.active { background: rgba(0,255,106,0.1); border-color: var(--green); color: var(--green); }
+
+  .alert { border-radius: 10px; padding: 14px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; display: none; align-items: flex-start; gap: 10px; line-height: 1.4; }
+  .alert.show { display: flex; }
+  .alert-error { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3); color: #ff7777; }
+  .alert-icon { font-size: 18px; flex-shrink: 0; }
+
+  .btn { width: 100%; background: var(--green); color: var(--black); border: none; border-radius: 10px; padding: 16px; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-loading { display: none; align-items: center; justify-content: center; gap: 8px; }
+  .btn.loading .btn-text { display: none; }
+  .btn.loading .btn-loading { display: flex; }
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.3); border-top-color: var(--black); border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+  .success-screen { display: none; text-align: center; padding: 40px 20px; animation: fadeUp 0.5s ease both; }
+  .success-screen.show { display: block; }
+  .success-icon { width: 80px; height: 80px; background: rgba(0,255,106,0.1); border: 2px solid var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 24px; box-shadow: 0 0 40px rgba(0,255,106,0.2); }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo-ring"><div class="logo-placeholder">HB</div></div>
+    <div class="header-tag">Helder da Bet</div>
+    <h1>AÇÃO <span>PIX</span></h1>
+    <p>Preencha seus dados para receber</p>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="step-icon">✅</div><div class="step-text">Concluiu as etapas</div></div>
+    <div class="step"><div class="step-icon">📝</div><div class="step-text">Preencha o formulário</div></div>
+    <div class="step"><div class="step-icon">💸</div><div class="step-text">Receba no PIX</div></div>
+  </div>
+
+  <div class="card" id="formCard">
+    <div class="card-title">SEUS DADOS</div>
+    <div class="card-sub">Preencha corretamente para receber seu PIX</div>
+
+    <div class="alert alert-error" id="alertError">
+      <span class="alert-icon">⚠️</span>
+      <span id="alertErrorMsg"></span>
+    </div>
+
+    <div class="field">
+      <label>WhatsApp</label>
+      <input type="tel" id="whatsapp" placeholder="(11) 99999-9999" maxlength="15" inputmode="numeric">
+      <div class="field-error" id="whatsappError"></div>
+    </div>
+
+    <div class="field">
+      <label>Nome Completo</label>
+      <input type="text" id="nome" placeholder="Seu nome completo">
+      <div class="field-error" id="nomeError"></div>
+    </div>
+
+    <div class="field">
+      <label>Chave PIX</label>
+      <div class="pix-types">
+        <button class="pix-type-btn active" onclick="setPixType('cpf')">CPF</button>
+        <button class="pix-type-btn" onclick="setPixType('telefone')">Telefone</button>
+        <button class="pix-type-btn" onclick="setPixType('email')">E-mail</button>
+      </div>
+      <input type="text" id="pix" placeholder="Digite seu CPF">
+      <div class="field-error" id="pixError"></div>
+    </div>
+
+    <button class="btn" id="submitBtn" onclick="handleSubmit()">
+      <span class="btn-text">QUERO RECEBER MEU PIX 💸</span>
+      <span class="btn-loading"><span class="spinner"></span> ENVIANDO...</span>
+    </button>
+  </div>
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <h2>DADOS ENVIADOS!</h2>
+    <p>Seus dados foram recebidos com sucesso.<br>Em breve você receberá seu PIX! 🤑</p>
+  </div>
+
+  <div class="footer">
+    <p>+18 | JOGUE COM RESPONSABILIDADE</p>
+    <div class="brand">@HELDERDABET</div>
+  </div>
+</div>
+
+<script>
+  const CONFIG = {
+    SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwSzOs2z_Cau-52lMij6cl6as8GeAS-3HLv9dYtG5gGOP8j2dvrUujhC3Y5l3rdOgAm/exec",
+    ACAO: "AÇÃO PIX"
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const analista = (params.get('analista') || 'kaique').toLowerCase();
+
+  let pixType = 'cpf';
+  let submitted = false;
+
+  function setPixType(type) {
+    pixType = type;
+    document.querySelectorAll('.pix-type-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    const pixInput = document.getElementById('pix');
+    pixInput.value = '';
+    clearError('pix');
+
+    if (type === 'cpf') {
+      pixInput.placeholder = 'Digite seu CPF'; pixInput.inputMode = 'numeric'; pixInput.maxLength = 14;
+    } else if (type === 'telefone') {
+      pixInput.placeholder = '(11) 99999-9999'; pixInput.inputMode = 'numeric'; pixInput.maxLength = 15;
+    } else {
+      pixInput.placeholder = 'seu@email.com'; pixInput.inputMode = 'email'; pixInput.maxLength = 100;
+    }
+  }
+
+  // Máscaras
+  document.getElementById('whatsapp').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0,11);
+    if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+    this.value = v;
+  });
+
+  document.getElementById('pix').addEventListener('input', function() {
+    if (pixType === 'cpf') {
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0,11);
+      if (v.length > 9) v = `${v.slice(0,3)}.${v.slice(3,6)}.${v.slice(6,9)}-${v.slice(9)}`;
+      else if (v.length > 6) v = `${v.slice(0,3)}.${v.slice(3,6)}.${v.slice(6)}`;
+      else if (v.length > 3) v = `${v.slice(0,3)}.${v.slice(3)}`;
+      this.value = v;
+    } else if (pixType === 'telefone') {
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 11) v = v.slice(0,11);
+      if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+      else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+      this.value = v;
+    }
+  });
+
+  function clearError(field) {
+    document.getElementById(field).classList.remove('error');
+    document.getElementById(field + 'Error').classList.remove('show');
+  }
+
+  function showError(field, msg) {
+    document.getElementById(field).classList.add('error');
+    const el = document.getElementById(field + 'Error');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+
+  function validateWhatsapp(v) { const d = v.replace(/\D/g, ''); return d.length < 10 ? 'WhatsApp inválido' : null; }
+  function validateNome(v) {
+    if (v.trim().length < 3) return 'Nome completo obrigatório';
+    if (v.trim().split(' ').length < 2) return 'Digite nome e sobrenome';
+    return null;
+  }
+  function validatePix(v) {
+    if (!v.trim()) return 'Chave PIX obrigatória';
+    if (pixType === 'cpf') {
+      const d = v.replace(/\D/g, '');
+      return d.length !== 11 ? 'CPF deve ter 11 dígitos' : null;
+    }
+    return null;
+  }
+
+  async function handleSubmit() {
     if (submitted) return;
 
     const whatsapp = document.getElementById('whatsapp').value;
     const nome = document.getElementById('nome').value;
     const pix = document.getElementById('pix').value;
 
-    // Limpar erros
-    ['whatsapp', 'nome', 'pix'].forEach(clearError);
+    ['whatsapp','nome','pix'].forEach(clearError);
     document.getElementById('alertError').classList.remove('show');
 
-    // Validações
     let hasError = false;
-    const wErr = validateWhatsapp(whatsapp);
-    if (wErr) { showError('whatsapp', wErr); hasError = true; }
-
-    const nErr = validateNome(nome);
-    if (nErr) { showError('nome', nErr); hasError = true; }
-
-    const pErr = validatePix(pix);
-    if (pErr) { showError('pix', pErr); hasError = true; }
+    if (validateWhatsapp(whatsapp)) { showError('whatsapp', validateWhatsapp(whatsapp)); hasError = true; }
+    if (validateNome(nome)) { showError('nome', validateNome(nome)); hasError = true; }
+    if (validatePix(pix)) { showError('pix', validatePix(pix)); hasError = true; }
 
     if (hasError) return;
 
-    // Loading
     const btn = document.getElementById('submitBtn');
     btn.classList.add('loading');
     btn.disabled = true;
 
     try {
-        const payload = {
-            whatsapp: whatsapp.replace(/\D/g, ''),
-            nome: nome.trim(),
-            pix: pix.trim(),
-            pixType: pixType,           // <-- útil para o backend
-            analista: analista,
-            acao: CONFIG.ACAO,
-            timestamp: new Date().toISOString()
-        };
+      const payload = {
+        whatsapp: whatsapp.replace(/\D/g, ''),
+        nome: nome.trim(),
+        pix: pix.trim(),
+        pixType: pixType,
+        analista: analista
+      };
 
-        const response = await fetch(CONFIG.SCRIPT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams(payload)   // ← Mudança principal
-        });
+      const response = await fetch(CONFIG.SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-        console.log('Status:', response.status);
+      const text = await response.text();
+      console.log('Resposta raw:', text);
 
-        let result;
-        const text = await response.text();
-        console.log('Resposta raw:', text);
+      const result = JSON.parse(text);
 
-        try {
-            result = JSON.parse(text);
-        } catch (e) {
-            console.error('Resposta não é JSON:', text);
-            throw new Error('Resposta inválida do servidor');
-        }
-
-        if (result.status === 'duplicate') {
-            const msg = result.field === 'whatsapp' 
-                ? '⚠️ Este WhatsApp já foi cadastrado nesta ação!' 
-                : result.field === 'pix'
-                ? '⚠️ Esta chave PIX já foi registrada!'
-                : '⚠️ Dados já cadastrados!';
-            
-            document.getElementById('alertErrorMsg').textContent = msg;
-            document.getElementById('alertError').classList.add('show');
-            
-        } else if (result.status === 'success') {
-            submitted = true;
-            document.getElementById('formCard').style.display = 'none';
-            document.getElementById('successScreen').classList.add('show');
-        } else {
-            throw new Error(result.message || 'Erro ao processar resposta');
-        }
-
-    } catch (e) {
-        console.error('Erro completo:', e);
+      if (result.status === 'duplicate') {
         document.getElementById('alertErrorMsg').textContent = 
-            'Erro ao enviar dados: ' + e.message;
+          result.field === 'whatsapp' ? '⚠️ WhatsApp já cadastrado nesta ação!' : '⚠️ PIX já cadastrado!';
         document.getElementById('alertError').classList.add('show');
+      } 
+      else if (result.status === 'success') {
+        submitted = true;
+        document.getElementById('formCard').style.display = 'none';
+        document.getElementById('successScreen').classList.add('show');
+      } 
+      else {
+        throw new Error(result.message || 'Erro ao salvar');
+      }
+    } catch (e) {
+      console.error(e);
+      document.getElementById('alertErrorMsg').textContent = 'Erro de conexão. Tente novamente.';
+      document.getElementById('alertError').classList.add('show');
     } finally {
-        btn.classList.remove('loading');
-        btn.disabled = false;
+      btn.classList.remove('loading');
+      btn.disabled = false;
     }
-}
+  }
+</script>
+</body>
+</html>
