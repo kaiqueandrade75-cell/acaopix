@@ -622,9 +622,74 @@
   }
 
   // Anti-spam: bloquear envio múltiplo
-  let submitted = false;
+let submitted = false;
 
-  async function handleSubmit() {
+async function handleSubmit() {
+
+  if (submitted) return;
+
+  const whatsapp = document.getElementById('whatsapp').value;
+  const nome = document.getElementById('nome').value;
+  const pix = document.getElementById('pix').value;
+
+  // Limpar erros
+  ['whatsapp', 'nome', 'pix'].forEach(clearError);
+
+  document
+    .getElementById('alertError')
+    .classList.remove('show');
+
+  // Validar
+  let hasError = false;
+
+  const wErr = validateWhatsapp(whatsapp);
+
+  if (wErr) {
+    showError('whatsapp', wErr);
+    hasError = true;
+  }
+
+  const nErr = validateNome(nome);
+
+  if (nErr) {
+    showError('nome', nErr);
+    hasError = true;
+  }
+
+  const pErr = validatePix(pix);
+
+  if (pErr) {
+    showError('pix', pErr);
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  // Loading
+  const btn = document.getElementById('submitBtn');
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+
+    const payload = {
+      whatsapp: whatsapp.replace(/\D/g, ''),
+      nome: nome.trim(),
+      pix: pix.trim(),
+      analista: analista
+    };
+
+    const response = await fetch(CONFIG.SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+
+    const text = await response.text();
 
     console.log('Resposta RAW:', text);
 
