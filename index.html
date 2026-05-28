@@ -587,16 +587,14 @@ input.error{
 
 const CONFIG = {
 
-  // URL atualizada do Apps Script (deploy novo)
+  // URL do Apps Script (deploy ativo "TESTE LP PIX 28-...")
   SCRIPT_URL:
     "https://script.google.com/macros/s/AKfycbyfJj9HNj6AFJ7sJr4UV6HnLb7zizFZmKUcDqvdQvtW145VtEgI_qyB-YCkqnbQ2t3e/exec",
 
-  // Nome da ação (identificador interno)
   ACAO: "AÇÃO PIX",
 
   // Versão da campanha. Pra começar uma nova campanha e
   // liberar leads que já participaram, troque pra 'v2', 'v3' etc.
-  // Isso invalida os localStorages antigos automaticamente.
   CAMPANHA: "v1",
 
   TIMEOUT: 15000,
@@ -604,7 +602,6 @@ const CONFIG = {
   ANALISTAS_VALIDOS: ['kaique','brenda','peu']
 };
 
-// Chave dinâmica do localStorage baseada na campanha
 function storageKey(visitorId){
   return 'acao_pix_' + CONFIG.CAMPANHA + '_' + visitorId;
 }
@@ -864,7 +861,6 @@ async function handleSubmit(){
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
 
-  // Normaliza PIX antes de enviar
   let pixNormalized = pix;
   if(pixType === 'cpf' || pixType === 'telefone'){
     pixNormalized = pix.replace(/\D/g,'');
