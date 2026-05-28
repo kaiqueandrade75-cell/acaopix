@@ -364,6 +364,117 @@ input.error{
   line-height:1.6;
 }
 
+/* ===== SEÇÃO DE TIPS (CASAS) ===== */
+.tips-section{ margin-top:36px; }
+
+.tips-divider{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:22px;
+}
+
+.tips-divider::before,
+.tips-divider::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--border),transparent);
+}
+
+.tips-divider span{ font-size:20px; }
+
+.tips-headline{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;
+  line-height:1.05;
+  letter-spacing:1px;
+  color:var(--white);
+}
+
+.tips-headline strong{
+  display:block;
+  font-size:40px;
+  color:var(--green);
+  text-shadow:0 0 26px rgba(0,255,106,.35);
+}
+
+.tips-sub{
+  font-size:12px;
+  color:var(--gray);
+  font-weight:600;
+  letter-spacing:.5px;
+  margin:6px 0 22px;
+}
+
+.tip-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+  text-decoration:none;
+  transition:.2s ease;
+  cursor:pointer;
+}
+
+.tip-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--green);
+  box-shadow:0 0 20px rgba(0,255,106,.15);
+}
+
+.tip-card::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:3px;
+  background:var(--green);
+}
+
+.tip-logo{
+  width:56px;
+  height:56px;
+  border-radius:14px;
+  background:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.tip-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.tip-content h3{
+  font-family:'Montserrat',sans-serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--white);
+  margin-bottom:3px;
+}
+
+.tip-content p{
+  font-size:12px;
+  color:var(--gray);
+  line-height:1.4;
+  font-weight:500;
+  margin:0;
+}
+
 .footer{
   text-align:center;
   margin-top:32px;
@@ -566,6 +677,67 @@ input.error{
       <br>
       Em breve você receberá seu PIX! 🤑
     </p>
+
+    <!-- ===== SEÇÃO DE TIPS (CASAS) ===== -->
+    <div class="tips-section">
+
+      <div class="tips-divider">
+        <span>🎁</span>
+      </div>
+
+      <div class="tips-headline">
+        VOCÊ ACABOU DE GANHAR
+        <strong>3 TIPS EXCLUSIVAS</strong>
+      </div>
+
+      <div class="tips-sub">
+        Suas entradas liberadas pelo @helderdabet
+      </div>
+
+      <!-- TIP 1 -->
+      <a href="https://superbet.bet.br/bilhete-compartilhado/899M-EBSA6E" class="tip-card" target="_blank" rel="noopener">
+
+        <div class="tip-logo">
+          <img src="https://raw.githubusercontent.com/kaiqueandrade75-cell/acaopix/main/logsuperbet.png" alt="Superbet">
+        </div>
+
+        <div class="tip-content">
+          <h3>Tip Exclusiva #1</h3>
+          <p>🚀 ACESSAR ENTRADA EXCLUSIVA</p>
+        </div>
+
+      </a>
+
+      <!-- TIP 2 -->
+      <a href="https://www.betano.bet.br/bookingcode/5NNNS6RA" class="tip-card" target="_blank" rel="noopener">
+
+        <div class="tip-logo">
+          <img src="https://raw.githubusercontent.com/kaiqueandrade75-cell/acaopix/main/logbetano.png" alt="Betano">
+        </div>
+
+        <div class="tip-content">
+          <h3>Tip Exclusiva #2</h3>
+          <p>🚀 ACESSAR ENTRADA EXCLUSIVA</p>
+        </div>
+
+      </a>
+
+      <!-- TIP 3 -->
+      <a href="https://go.aff.esportiva.bet/dvpdwqzj?campaign_id=23107&shareCode=97OGUTYZH60" class="tip-card" target="_blank" rel="noopener">
+
+        <div class="tip-logo">
+          <img src="https://raw.githubusercontent.com/kaiqueandrade75-cell/acaopix/main/logesportiva.png" alt="EsportivaBet">
+        </div>
+
+        <div class="tip-content">
+          <h3>Tip Exclusiva #3</h3>
+          <p>🚀 ACESSAR ENTRADA EXCLUSIVA</p>
+        </div>
+
+      </a>
+
+    </div>
+    <!-- ===== FIM DA SEÇÃO DE TIPS ===== -->
 
   </div>
 
