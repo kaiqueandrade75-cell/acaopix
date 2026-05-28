@@ -921,7 +921,7 @@ async function handleSubmit(){
 
       // Em duplicidade, trava igual sucesso (não deixa tentar de novo)
       if(visitorId){
-        localStorage.setItem('acao_pix_' + visitorId, 'true');
+        localStorage.setItem('acao_pix_v2' + visitorId, 'true');
       }
 
       submitBtn.classList.remove('loading');
@@ -932,7 +932,7 @@ async function handleSubmit(){
     if(result.status === 'success'){
 
       if(visitorId){
-        localStorage.setItem('acao_pix_' + visitorId, 'true');
+        localStorage.setItem('acao_pix_v2' + visitorId, 'true');
       }
 
       document.getElementById('formCard').style.display = 'none';
