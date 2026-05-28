@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -80,7 +81,7 @@ body::before{
   line-height:1.6;
 }
 
-/* ===== SEÇÃO DE TIPS (3 ESPAÇOS) ===== */
+/* ===== SEÇÃO DE TIPS ===== */
 .tips-section{ margin-top:36px; }
 
 .tips-divider{
@@ -135,6 +136,15 @@ body::before{
   text-align:left;
   position:relative;
   overflow:hidden;
+  text-decoration:none;
+  transition:.2s ease;
+  cursor:pointer;
+}
+
+.tip-card:hover{
+  transform:translateY(-2px);
+  border-color:var(--green);
+  box-shadow:0 0 20px rgba(0,255,106,.15);
 }
 
 .tip-card::before{
@@ -147,19 +157,23 @@ body::before{
   background:var(--green);
 }
 
-.tip-number{
-  flex-shrink:0;
-  width:44px;
-  height:44px;
-  border-radius:12px;
-  background:rgba(0,255,106,.1);
-  border:1.5px solid var(--green);
+.tip-logo{
+  width:56px;
+  height:56px;
+  border-radius:14px;
+  background:#111;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:'Bebas Neue',sans-serif;
-  font-size:24px;
-  color:var(--green);
+  overflow:hidden;
+  flex-shrink:0;
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.tip-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
 .tip-content h3{
@@ -213,9 +227,7 @@ body::before{
 
 <div class="container">
 
-  <div class="preview-flag">
-    
-  </div>
+  <div class="preview-flag"></div>
 
   <div class="success-screen">
 
@@ -244,29 +256,47 @@ body::before{
         Suas entradas liberadas pelo @helderdabet
       </div>
 
-      <div class="tip-card">
-        <div class="tip-number">1</div>
+      <!-- TIP 1 -->
+      <a href="COLE_SEU_LINK_CAMUFLADO_AQUI" class="tip-card" target="_blank">
+
+        <div class="tip-logo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Betano_logo.png" alt="Betano">
+        </div>
+
         <div class="tip-content">
           <h3>Tip Exclusiva #1</h3>
-          <p>https://www.betano.bet.br/bookingcode/5NNNS6RA</p>
+          <p>Clique para acessar sua entrada exclusiva</p>
         </div>
-      </div>
 
-      <div class="tip-card">
-        <div class="tip-number">2</div>
+      </a>
+
+      <!-- TIP 2 -->
+      <a href="COLE_SEU_LINK_CAMUFLADO_AQUI" class="tip-card" target="_blank">
+
+        <div class="tip-logo">
+          <img src="https://logodownload.org/wp-content/uploads/2024/05/superbet-logo-0.png" alt="Superbet">
+        </div>
+
         <div class="tip-content">
           <h3>Tip Exclusiva #2</h3>
-          <p>Edite aqui com a sua segunda tip.</p>
+          <p>Clique para acessar sua entrada exclusiva</p>
         </div>
-      </div>
 
-      <div class="tip-card">
-        <div class="tip-number">3</div>
+      </a>
+
+      <!-- TIP 3 -->
+      <a href="COLE_SEU_LINK_CAMUFLADO_AQUI" class="tip-card" target="_blank">
+
+        <div class="tip-logo">
+          <img src="https://logodownload.org/wp-content/uploads/2024/08/7k-bet-logo.png" alt="7K Bet">
+        </div>
+
         <div class="tip-content">
           <h3>Tip Exclusiva #3</h3>
-          <p>Edite aqui com a sua terceira tip.</p>
+          <p>Clique para acessar sua entrada exclusiva</p>
         </div>
-      </div>
+
+      </a>
 
     </div>
 
