@@ -586,20 +586,32 @@ input.error{
 <script>
 
 const CONFIG = {
+
+  // URL atualizada do Apps Script (deploy novo)
   SCRIPT_URL:
-    "https://script.google.com/macros/s/AKfycbzC4r5C0wQhniwyIjvJCtl9vhDEabie-Tpfx4yPvaJx-04nb6xeFLRms8yYCZgQNgAU/exec",
-  ACAO:"AÇÃO PIX",
-  TIMEOUT:15000,
-  ANALISTAS_VALIDOS:['kaique','brenda','peu']
+    "https://script.google.com/macros/s/AKfycbyfJj9HNj6AFJ7sJr4UV6HnLb7zizFZmKUcDqvdQvtW145VtEgI_qyB-YCkqnbQ2t3e/exec",
+
+  // Nome da ação (identificador interno)
+  ACAO: "AÇÃO PIX",
+
+  // Versão da campanha. Pra começar uma nova campanha e
+  // liberar leads que já participaram, troque pra 'v2', 'v3' etc.
+  // Isso invalida os localStorages antigos automaticamente.
+  CAMPANHA: "v1",
+
+  TIMEOUT: 15000,
+
+  ANALISTAS_VALIDOS: ['kaique','brenda','peu']
 };
 
-const params =
-  new URLSearchParams(window.location.search);
+// Chave dinâmica do localStorage baseada na campanha
+function storageKey(visitorId){
+  return 'acao_pix_' + CONFIG.CAMPANHA + '_' + visitorId;
+}
 
-// Valida analista pra não cair sempre no default 'kaique'
-let analista =
-  (params.get('analista') || 'kaique').toLowerCase();
+const params = new URLSearchParams(window.location.search);
 
+let analista = (params.get('analista') || 'kaique').toLowerCase();
 if(!CONFIG.ANALISTAS_VALIDOS.includes(analista)){
   analista = 'kaique';
 }
@@ -607,21 +619,16 @@ if(!CONFIG.ANALISTAS_VALIDOS.includes(analista)){
 let visitorId = null;
 let pixType = 'cpf';
 let submitted = false;
-let isSubmitting = false; // trava extra contra duplo clique
+let isSubmitting = false;
 
-const submitBtn =
-  document.getElementById('submitBtn');
+const submitBtn = document.getElementById('submitBtn');
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-  }
+  if (e.key === 'Enter') e.preventDefault();
 });
 
 function sanitize(str){
-  return String(str || '')
-    .replace(/[<>]/g,'')
-    .trim();
+  return String(str || '').replace(/[<>]/g,'').trim();
 }
 
 function clearError(field){
@@ -656,13 +663,11 @@ async function initFingerprint(){
 
     const fp = await FingerprintJS.load();
     const result = await fp.get();
-
     visitorId = result.visitorId;
 
     console.log('FINGERPRINT:', visitorId);
 
-    const alreadySent =
-      localStorage.getItem('acao_pix_' + visitorId);
+    const alreadySent = localStorage.getItem(storageKey(visitorId));
 
     if(alreadySent === 'true'){
       document.getElementById('formCard').style.display = 'none';
@@ -714,7 +719,6 @@ document.querySelectorAll('.pix-type-btn').forEach(btn => {
 document.getElementById('whatsapp').addEventListener('input', function(){
 
   let v = this.value.replace(/\D/g,'');
-
   if(v.length > 11) v = v.slice(0,11);
 
   if(v.length > 6)
@@ -827,7 +831,6 @@ submitBtn.addEventListener('click', handleSubmit);
 
 async function handleSubmit(){
 
-  // Trava IMEDIATA contra duplo clique (antes da validação)
   if(submitted || isSubmitting) return;
   isSubmitting = true;
 
@@ -850,7 +853,7 @@ async function handleSubmit(){
   if(pErr){ showError('pix',pErr); hasError = true; }
 
   if(hasError){
-    isSubmitting = false; // libera pro usuário corrigir
+    isSubmitting = false;
     return;
   }
 
@@ -861,7 +864,7 @@ async function handleSubmit(){
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
 
-  // Normaliza PIX antes de enviar (remove formatação pra CPF/telefone)
+  // Normaliza PIX antes de enviar
   let pixNormalized = pix;
   if(pixType === 'cpf' || pixType === 'telefone'){
     pixNormalized = pix.replace(/\D/g,'');
@@ -880,6 +883,7 @@ async function handleSubmit(){
       visitorId: visitorId || '',
       userAgent: navigator.userAgent,
       action: CONFIG.ACAO,
+      campanha: CONFIG.CAMPANHA,
       timestamp: new Date().toISOString()
     };
 
@@ -909,30 +913,24 @@ async function handleSubmit(){
     if(result.status === 'duplicate'){
 
       let msg = '⚠️ Dados já cadastrados!';
-
-      if(result.field === 'whatsapp')
-        msg = '⚠️ Este WhatsApp já participou!';
-      if(result.field === 'pix')
-        msg = '⚠️ Esta chave PIX já foi usada!';
-      if(result.field === 'device')
-        msg = '⚠️ Este dispositivo já participou!';
+      if(result.field === 'whatsapp') msg = '⚠️ Este WhatsApp já participou!';
+      if(result.field === 'pix') msg = '⚠️ Esta chave PIX já foi usada!';
+      if(result.field === 'device') msg = '⚠️ Este dispositivo já participou!';
 
       showAlert(msg);
 
-      // Em duplicidade, trava igual sucesso (não deixa tentar de novo)
       if(visitorId){
-        localStorage.setItem('acao_pix_v2' + visitorId, 'true');
+        localStorage.setItem(storageKey(visitorId), 'true');
       }
 
       submitBtn.classList.remove('loading');
-      // Não libera mais: dispositivo já participou
       return;
     }
 
     if(result.status === 'success'){
 
       if(visitorId){
-        localStorage.setItem('acao_pix_v2' + visitorId, 'true');
+        localStorage.setItem(storageKey(visitorId), 'true');
       }
 
       document.getElementById('formCard').style.display = 'none';
@@ -940,7 +938,6 @@ async function handleSubmit(){
       return;
     }
 
-    // Erro de validação do servidor (ex: CPF inválido)
     throw new Error(result.message || 'Erro desconhecido');
 
   }catch(err){
@@ -948,14 +945,12 @@ async function handleSubmit(){
     console.error(err);
 
     let msg = 'Erro ao enviar. Tente novamente.';
-
     if(err.name === 'AbortError'){
       msg = 'Tempo excedido. Verifique sua conexão.';
     }
 
     showAlert(msg);
 
-    // Erro de rede/servidor: libera pra tentar de novo
     submitted = false;
     isSubmitting = false;
     submitBtn.disabled = false;
